@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="icon" type="image/png" href="icon.png">
+    <title>Velchat-Secured</title>
+    <style>
+        :root { 
+            --neon: #00ff41; 
+            --neon-blue: #00d4ff;
+            --neon-purple: #b800ff;
+            --bg: #0a0a0a; 
+            --panel: #141414; 
+            --text: #d0d0d0; 
+            --danger: #ff4141;
+            --warning: #ffaa00;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Courier New', monospace; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .wrapper { 
+            width: 100%; 
+            max-width: 900px; 
+            display: flex; 
+            flex-direction: column; 
+            border-left: 1px solid #333; 
+            border-right: 1px solid #333; 
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+        }
+        
+        .setup-header { 
+            background: linear-gradient(135deg, var(--panel) 0%, #1a1a1a 100%);
+            padding: 12px 20px; 
+            cursor: pointer; 
+            border-bottom: 1px solid #333; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            font-size: 0.8rem; 
+            color: var(--neon); 
+            transition: background 0.3s;
+        }
+        
+        .setup-header:hover { background: linear-gradient(135deg, #1a1a1a 0%, var(--panel) 100%); }
+        
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .header-right { display: flex; align-items: center; gap: 8px; position: relative; }
+        
+        .encryption-badge {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--neon);
+            padding: 3px 8px;
+            font-size: 0.65rem;
+            border-radius: 2px;
+        }
+        
+        .tutorial-btn {
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            padding: 3px 9px;
+            font-size: 0.65rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border-radius: 2px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+        .tutorial-btn:hover {
+            border-color: var(--neon);
+            color: var(--neon);
+            box-shadow: 0 0 8px rgba(0,255,65,0.15);
+        }
+        @media (max-width: 768px) {
+            .tutorial-btn {
+                font-size: 0.7rem;
+                padding: 8px 12px;
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .panic-btn { 
+            background: transparent; 
+            color: var(--danger); 
+            border: 1px solid var(--danger); 
+            padding: 5px 12px; 
+            cursor: pointer; 
+            font-family: 'Courier New'; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            transition: all 0.2s; 
+        }
+        
+        .panic-btn:hover { 
+            background: var(--danger); 
+            color: #000; 
+            box-shadow: 0 0 15px var(--danger); 
+        }
+        
+        #setup-content { 
+            background: #0f0f0f; 
+            padding: 0; 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+         }
+        
+        #setup-content.open { 
+            max-height: min(600px, 50vh); 
+            padding: 20px; 
+            border-bottom: 1px solid #333; 
+            overflow-y: auto;
+        }
+
+        .step-box { margin-bottom: 15px; }
+        .step-label { 
+            font-size: 0.7rem; 
+            text-transform: uppercase; 
+            color: #888; 
+            margin-bottom: 5px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        textarea { 
+            width: 100%; 
+            height: 60px; 
+            background: #000; 
+            color: var(--neon); 
+            border: 1px solid #333; 
+            padding: 10px; 
+            font-size: 10px; 
+            resize: vertical; 
+            outline: none; 
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus { 
+            border-color: var(--neon); 
+            box-shadow: 0 0 5px rgba(0, 255, 65, 0.2);
+        }
+        
+        button { 
+            background: transparent; 
+            color: var(--neon); 
+            border: 1px solid var(--neon); 
+            padding: 6px 14px; 
+            cursor: pointer; 
+            font-family: 'Courier New'; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            transition: all 0.2s; 
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover { 
+            background: var(--neon); 
+            color: #000; 
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        button:active { transform: scale(0.95); }
+        
+        button:disabled { 
+            opacity: 0.3; 
+            cursor: not-allowed; 
+        }
+        
+        button:disabled:hover { 
+            background: transparent; 
+            color: var(--neon); 
+            transform: none;
+        }
+        
+        #chat-log { 
+            flex: 1 1 0;
+            min-height: 0;
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            scroll-behavior: smooth; 
+            background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        #chat-log::-webkit-scrollbar { width: 8px; }
+        #chat-log::-webkit-scrollbar-track { background: #0a0a0a; }
+        #chat-log::-webkit-scrollbar-thumb { 
+            background: #333; 
+            border-radius: 4px; 
+        }
+        #chat-log::-webkit-scrollbar-thumb:hover { background: #444; }
+        
+        .msg { 
+            max-width: 75%; 
+            padding: 10px 14px; 
+            border-radius: 4px; 
+            font-size: 0.9rem; 
+            line-height: 1.5; 
+            position: relative; 
+            word-wrap: break-word; 
+            animation: slideIn 0.3s ease-out;
+            transition: all 0.2s;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .msg:hover { transform: translateX(2px); }
+        
+        .sent { 
+            align-self: flex-end; 
+            border: 1px solid var(--neon); 
+            color: var(--neon); 
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.05) 0%, rgba(0, 255, 65, 0.1) 100%); 
+        }
+        
+        .received { 
+            align-self: flex-start; 
+            border: 1px solid #444; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #151515 100%); 
+        }
+        
+        .system { 
+            align-self: center; 
+            font-size: 0.75rem; 
+            color: #666; 
+            font-style: italic; 
+            border: 1px solid #222; 
+            background: #0f0f0f;
+            max-width: 90%;
+        }
+        
+        .timestamp { 
+            font-size: 0.65rem; 
+            color: #555; 
+            margin-top: 4px; 
+            display: block; 
+        }
+        
+        .msg-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .msg-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .msg:hover .msg-actions { opacity: 1; }
+        
+        .msg-action-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 2px 4px;
+            font-size: 0.7rem;
+            transition: color 0.2s;
+        }
+        
+        .msg-action-btn:hover { color: var(--neon); }
+        
+        .file-msg { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        
+        .file-icon { 
+            font-size: 1.5rem; 
+            filter: drop-shadow(0 0 3px rgba(0, 255, 65, 0.3));
+        }
+        
+        .file-download { 
+            text-decoration: underline; 
+            cursor: pointer; 
+            color: var(--neon-blue);
+            transition: color 0.2s;
+        }
+        
+        .file-download:hover { color: var(--neon); }
+        
+        .msg-status { 
+            font-size: 0.6rem; 
+            color: #666; 
+            margin-left: 5px; 
+        }
+        
+        .msg-status.read { color: var(--neon); }
+        
+        .msg-edited {
+            font-size: 0.6rem;
+            color: #888;
+            font-style: italic;
+            margin-left: 5px;
+        }
+
+        .input-area { 
+            padding: 16px 20px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
+            background: linear-gradient(180deg, var(--panel) 0%, #0f0f0f 100%);
+            border-top: 1px solid #333; 
+            flex-shrink: 0;
+            z-index: 60;
+            box-shadow: 0 -6px 18px rgba(0,0,0,0.6);
+        }
+        
+        .input-row { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 12px; 
+            position: relative;
+            align-items: center;
+        }
+        
+        .input-controls { 
+            display: flex; 
+            gap: 6px; 
+            flex-wrap: wrap; 
+        }
+        
+        #msg-input { 
+            flex-grow: 1; 
+            background: #000; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 12px; 
+            outline: none; 
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        
+        #msg-input:focus { 
+            border-color: var(--neon); 
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+        
+        #file-input { display: none; }
+        
+        .small-btn { 
+            padding: 4px 10px; 
+            font-size: 0.7rem; 
+        }
+        
+        .typing-indicator { 
+            font-size: 0.7rem; 
+            color: #666; 
+            font-style: italic; 
+            padding: 0 20px 8px 20px; 
+            min-height: 24px; 
+            display: flex;
+            align-items: center;
+        }
+        
+        .typing-dots {
+            display: inline-flex;
+            gap: 3px;
+            margin-left: 5px;
+        }
+        
+        .typing-dots span {
+            width: 4px;
+            height: 4px;
+            background: var(--neon);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        /* Scroll to bottom button */
+        #scroll-to-bottom {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            background: var(--panel);
+            border: 1px solid var(--neon);
+            color: var(--neon);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            z-index: 50;
+            box-shadow: 0 2px 10px rgba(0,255,65,0.3);
+            transition: all 0.2s;
+            padding: 0;
+        }
+        #scroll-to-bottom:hover {
+            background: var(--neon);
+            color: #000;
+        }
+        #scroll-to-bottom.visible { display: flex; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+
+        .status-dot { 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            background: var(--danger); 
+            display: inline-block; 
+            margin-right: 8px; 
+            transition: all 0.3s;
+        }
+        
+        .online { 
+            background: var(--neon); 
+            box-shadow: 0 0 8px var(--neon); 
+            animation: pulse 2s infinite; 
+        }
+        
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--neon); } 
+            50% { opacity: 0.6; box-shadow: 0 0 15px var(--neon); } 
+        }
+        
+        .connection-info { 
+            font-size: 0.65rem; 
+            color: #666; 
+            margin-top: 15px; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 8px; 
+            padding: 10px;
+            background: rgba(0, 255, 65, 0.02);
+            border: 1px solid #222;
+            border-radius: 2px;
+        }
+        
+        .connection-info-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .connection-info-label { color: #888; }
+        .connection-info-value { 
+            color: var(--neon); 
+            font-weight: bold;
+        }
+        
+        .notification { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: var(--panel); 
+            border: 1px solid var(--neon); 
+            padding: 12px 18px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+            animation: notifSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 1000; 
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
+            max-width: 300px;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        /* Mobile action menu (hidden by default) */
+        #mobile-action-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--panel);
+            border: 1px solid #222;
+            padding: 8px;
+            width: 220px;
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            border-radius: 4px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            z-index: 1100;
+        }
+
+        #mobile-action-menu.show { display: flex; }
+
+        #mobile-menu-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.06);
+            color: var(--neon);
+            padding: 6px 8px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        @keyframes notifSlideIn { 
+            from { transform: translateX(400px); opacity: 0; } 
+            to { transform: translateX(0); opacity: 1; } 
+        }
+        
+        .quick-setup { 
+            background: linear-gradient(135deg, #1a1a1a 0%, #141414 100%);
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border: 1px solid #333; 
+            border-radius: 4px; 
+        }
+        
+        .guide-link-row {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .guide-link {
+            color: #555;
+            font-size: 0.68rem;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.04em;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .guide-link:hover { color: var(--neon); }
+
+        .guide-link-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #333;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+
+        .guide-link:hover .guide-link-dot { background: var(--neon); }
+
+        .quick-setup-title { 
+            font-size: 0.75rem; 
+            color: var(--neon); 
+            margin-bottom: 10px; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-group { 
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px; 
+        }
+        
+
+        
+        .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .settings-modal.show { display: flex; }
+        
+        .settings-content {
+            background: var(--panel);
+            border: 1px solid var(--neon);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 4px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .settings-title {
+            font-size: 1.2rem;
+            color: var(--neon);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .setting-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .setting-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .setting-control {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #333;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch.on { background: var(--neon); }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.on .toggle-slider { transform: translateX(26px); }
+        
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .theme-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.18s, box-shadow 0.18s;
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.25);        
+        }
+        
+        .theme-option:hover { transform: scale(1.1); }
+        .theme-option.active { border-color: var(--neon); box-shadow: 0 0 10px var(--neon); }
+        
+        .theme-green { background: linear-gradient(135deg, #00ff41 0%, #00aa2a 100%); }
+        .theme-blue { background: linear-gradient(135deg, #00d4ff 0%, #0088cc 100%); }
+        .theme-purple { background: linear-gradient(135deg, #b800ff 0%, #7700aa 100%); }
+        .theme-red { background: linear-gradient(135deg, #ff4141 0%, #aa0000 100%); }
+        .theme-yellow { background: linear-gradient(135deg, #ffea00 0%, #ffb300 100%); }
+        .theme-gray { background: linear-gradient(135deg, #8e8e93 0%, #222222 100%); }
+        
+        
+        .search-box {
+            background: #000;
+            border: 1px solid #333;
+            padding: 8px;
+            width: 100%;
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--neon);
+        }
+        
+        .msg.highlight {
+            background: rgba(255, 170, 0, 0.2) !important;
+            border-color: var(--warning) !important;
+        }
+        
+        /* Mobile Detection & Responsive Design */
+        @media (max-width: 768px) {
+            body { font-size: 14px; }
+            
+            .wrapper { 
+                max-width: 100%; 
+                border-left: none;
+                border-right: none;
+            }
+            
+            .setup-header { 
+                padding: 10px 15px; 
+                font-size: 0.7rem;
+                flex-wrap: wrap;
+            }
+            
+            .header-left, .header-right {
+                gap: 8px;
+            }
+            
+            .encryption-badge {
+                font-size: 0.6rem;
+                padding: 2px 6px;
+            }
+            
+            .panic-btn {
+                padding: 4px 4px;
+                font-size: 0.65rem;
+                min-width: auto;
+                width: auto;
+            }
+            
+            /* Make file button compact on mobile */
+            #file-btn {
+                padding: 4px 16px;
+                min-width: auto;
+                width: auto;
+            }
+            
+            /* Adjust send button for proper alignment */
+            #send-btn {
+                padding: 10px 16px;
+                flex-shrink: 0;
+            }
+            
+            #setup-content.open {
+                max-height: min(450px, 45vh);
+                padding: 15px;
+            }
+            
+            textarea {
+                height: 50px;
+                font-size: 9px;
+                padding: 8px;
+            }
+            
+            button {
+                padding: 8px 12px;
+                font-size: 0.75rem;
+            }
+            
+            .small-btn {
+                padding: 6px 8px;
+                font-size: 0.65rem;
+            }
+            
+            #chat-log {
+                padding: 15px 10px;
+                gap: 10px;
+            }
+            
+            .msg { 
+                max-width: 85%; 
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .msg-actions {
+                opacity: 1; /* Always show on mobile */
+            }
+            
+            .msg-action-btn {
+                font-size: 0.9rem;
+                padding: 4px 6px;
+            }
+            
+            .timestamp {
+                font-size: 0.6rem;
+            }
+            
+            .input-area {
+                padding: 10px 10px;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            }
+            
+            .input-row {
+                gap: 6px;
+                margin-bottom: 8px;
+                align-items: center;
+            }
+            
+            #msg-input {
+                padding: 10px;
+                font-size: 0.9rem;
+                flex: 1;
+                min-width: 0;
+            }
+            
+            .input-controls {
+                gap: 4px;
+                justify-content: space-between;
+            }
+            
+            #settings-btn {
+                flex: 1 1 100%;
+            }
+            
+            .connection-info { 
+                grid-template-columns: 1fr 1fr; 
+                font-size: 0.6rem;
+                gap: 6px;
+                padding: 8px;
+            }
+            
+            .settings-content { 
+                padding: 20px; 
+                width: 95%;
+                max-height: 90vh;
+            }
+            
+            .settings-title {
+                font-size: 1rem;
+            }
+            
+            .setting-item {
+                margin-bottom: 15px;
+                padding-bottom: 12px;
+            }
+            
+            .notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: calc(100% - 20px);
+                font-size: 0.75rem;
+                padding: 10px 12px;
+            }
+            
+            .quick-setup {
+                padding: 12px;
+            }
+            
+            .quick-setup-title {
+                font-size: 0.7rem;
+            }
+            
+            .step-label {
+                font-size: 0.65rem;
+            }
+            
+            .file-icon {
+                font-size: 1.2rem;
+            }
+            
+            .typing-indicator {
+                padding: 0 10px 6px 10px;
+                font-size: 0.65rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .setup-header {
+                font-size: 0.65rem;
+                padding: 8px 10px;
+            }
+            
+            .encryption-badge {
+                display: none; /* Hide on very small screens */
+            }
+            
+            .header-right span {
+                display: none; /* Hide toggle text */
+            }
+            
+            .msg {
+                font-size: 0.8rem;
+                padding: 6px 8px;
+            }
+            
+            .connection-info {
+                font-size: 0.55rem;
+            }
+            
+            .input-controls {
+                flex-wrap: wrap;
+            }
+            
+            .small-btn {
+                flex: 0 0 auto;
+                min-width: 56px;
+            }
+
+            .input-controls {
+                overflow-x: auto; /* allow horizontal scroll for many buttons */
+                flex-wrap: nowrap;
+                gap: 8px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* hide the flexible spacer so buttons remain compact */
+            .input-controls > div[style] { display: none; }
+
+            .panic-btn {
+                width: auto;
+                margin-top: 0;
+                min-width: 36px;
+                align-self: center;
+            }
+
+            #settings-btn {
+                width: auto;
+                min-height: 36px;
+            }
+        }
+        
+        /* Mobile-specific styles */
+        .mobile-only { display: none; }
+        .desktop-only { display: block; }
+        
+        @media (max-width: 768px) {
+            .mobile-only { display: block; }
+            .desktop-only { display: none; }
+            /* Hide bottom panic on mobile (we move it to header) */
+            .input-controls .panic-btn { display: none; }
+            /* Hide menu buttons from bottom on mobile (they're in the dropdown menu now) */
+            .input-controls #search-btn,
+            .input-controls #clear-btn,
+            .input-controls #export-btn,
+            .input-controls #settings-btn { display: none !important; }
+            /* Hide the text part of icon buttons when space is tight */
+            .btn-text { display: inline; }
+            .small-btn .btn-text { display: none; }
+        }
+        
+        /* Touch-friendly interactions */
+        @media (hover: none) and (pointer: coarse) {
+            button, .msg-action-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .small-btn {
+                min-height: 40px;
+            }
+            
+            textarea {
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+            
+            #msg-input {
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="setup-header" onclick="toggleSetup()">
+        <div class="header-left">
+            <span><span id="status-dot" class="status-dot"></span> CONNECTION_PROTOCOL</span>
+            <span class="encryption-badge">🔒 E2E ENCRYPTED</span>
+        </div>
+        <div class="header-right">
+            <a href="guide.html" target="_blank" class="tutorial-btn desktop-only">? GUIDE</a>
+            <span class="desktop-only" style="font-size: 0.7rem; color: #666;">[CLICK TO TOGGLE]</span>
+            <!-- Mobile panic (moved here on mobile) - NOW BEFORE MENU BUTTON -->
+            <button id="panic-top-btn" class="panic-btn mobile-only" style="display:none">⚠️</button>
+            <!-- Mobile menu button (only shown on mobile) -->
+            <button id="mobile-menu-btn" class="mobile-only" aria-label="Open actions">⋯</button>
+            <div id="mobile-action-menu" class="mobile-only" aria-hidden="true"></div>
+        </div>
+    </div>
+    
+    <div id="setup-content">
+        <div class="quick-setup">
+            <div class="quick-setup-title">
+                <span>⚡</span>
+                <span>QUICK SETUP</span>
+            </div>
+            <div class="btn-group">
+                <button id="host-btn">🖥️ I'M HOST</button>
+                <button id="join-btn">📱 I'M JOINING</button>
+            </div>
+            <div class="guide-link-row">
+                <span class="guide-link-dot"></span>
+                <a href="guide.html" target="_blank" class="guide-link">First time? Read the guide</a>
+                <span class="guide-link-dot"></span>
+            </div>
+        </div>
+        
+        <div class="step-box" id="host-section" style="display:none">
+            <div class="step-label">
+                <span>HOST: Share This Code</span>
+                <span style="color: var(--neon);">●●●</span>
+            </div>
+            <textarea id="off-out" placeholder="Generating offer..." readonly></textarea>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button onclick="copyKey('off-out')" style="flex: 1;">📋 COPY</button>
+                <button onclick="generateQR('off-out')" style="flex: 1;">📱 QR CODE</button>
+            </div>
+        </div>
+        
+        <div class="step-box" id="join-section" style="display:none">
+            <div class="step-label">
+                <span>PEER: Paste Host's Code</span>
+                <span style="color: var(--neon-blue);">●●●</span>
+            </div>
+            <textarea id="off-in" placeholder="Paste host's offer code here..."></textarea>
+            <button id="connect-btn" style="width: 100%; margin-top: 8px;">🔗 CONNECT</button>
+            <div id="answer-area" style="margin-top:12px; display:none">
+                <div class="step-label">
+                    <span>Your Response Code</span>
+                </div>
+                <textarea id="ans-out" placeholder="Send this back to host..." readonly></textarea>
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                    <button onclick="copyKey('ans-out')" style="flex: 1;">📋 COPY</button>
+                    <button onclick="generateQR('ans-out')" style="flex: 1;">📱 QR CODE</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-box" id="finalize-section" style="display:none">
+            <div class="step-label">
+                <span>HOST: Final Step - Paste Peer's Response</span>
+                <span style="color: var(--neon-purple);">●●●</span>
+            </div>
+            <textarea id="ans-in" placeholder="Paste peer's answer code..."></textarea>
+            <button id="complete-btn" style="width: 100%; margin-top: 8px;">✅ COMPLETE CONNECTION</button>
+        </div>
+        
+        <div class="connection-info">
+            <div class="connection-info-item">
+                <span class="connection-info-label">Connection ID:</span>
+                <span class="connection-info-value" id="conn-id">---</span>
+            </div>
+            <div class="connection-info-item">
+                <span class="connection-info-label">Latency:</span>
+                <span class="connection-info-value"><span id="latency">---</span>ms</span>
+            </div>
+            <div class="connection-info-item">
+                <span class="connection-info-label">Messages:</span>
+                <span class="connection-info-value" id="msg-count">0</span>
+            </div>
+            <div class="connection-info-item">
+                <span class="connection-info-label">Uptime:</span>
+                <span class="connection-info-value" id="uptime">---</span>
+            </div>
+            <div class="connection-info-item">
+                <span class="connection-info-label">Data Sent:</span>
+                <span class="connection-info-value" id="data-sent">0 KB</span>
+            </div>
+            <div class="connection-info-item">
+                <span class="connection-info-label">Data Received:</span>
+                <span class="connection-info-value" id="data-received">0 KB</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-log">
+        <div class="msg system">🔒 Secure P2P Chat - End-to-End Encrypted - Choose setup mode above</div>
+    </div>
+    
+    <div style="position:relative;">
+        <div class="typing-indicator" id="typing-indicator"></div>
+        <button id="scroll-to-bottom" title="Scroll to bottom">↓</button>
+    </div>
+
+    <div class="input-area">
+        <div class="input-row">
+            <input type="text" id="msg-input" placeholder="Type your message..." autocomplete="off" disabled>
+            <button id="send-btn" disabled>SEND</button>
+        </div>
+        <div class="input-controls">
+            <input type="file" id="file-input" multiple>
+                <button class="small-btn" id="file-btn" disabled>📎 <span class="btn-text">FILE</span></button>
+            <button class="small-btn" id="search-btn">🔍 SEARCH</button>
+            <button class="small-btn" id="clear-btn">🗑️ CLEAR</button>
+            <button class="small-btn" id="export-btn">💾 EXPORT</button>
+            <button class="small-btn" id="settings-btn">⚙️ SETTINGS</button>
+            <div style="flex-grow: 1;"></div>
+            <button class="panic-btn" id="panic-btn">⚠️ PANIC</button>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="settings-modal" id="settings-modal">
+    <div class="settings-content">
+        <div class="settings-title">⚙️ SETTINGS</div>
+        
+        <div class="setting-item">
+            <label class="setting-label">Sound Notifications</label>
+            <div class="setting-control">
+                <div class="toggle-switch" id="sound-toggle">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span id="sound-status">Enabled</span>
+            </div>
+        </div>
+        
+        
+        <div class="setting-item">
+            <label class="setting-label">Auto-Scroll</label>
+            <div class="setting-control">
+                <div class="toggle-switch on" id="autoscroll-toggle">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span id="autoscroll-status">Enabled</span>
+            </div>
+        </div>
+        
+        <div class="setting-item">
+            <label class="setting-label">Message Timestamps</label>
+            <div class="setting-control">
+                <div class="toggle-switch on" id="timestamp-toggle">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span id="timestamp-status">Enabled</span>
+            </div>
+        </div>
+        
+        <div class="setting-item">
+            <label class="setting-label">Read Receipts</label>
+            <div class="setting-control">
+                <div class="toggle-switch on" id="read-receipt-toggle">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span id="read-receipt-status">Enabled</span>
+            </div>
+        </div>
+        
+        <div class="setting-item">
+            <label class="setting-label">Theme Color</label>
+            <div class="theme-selector">
+                <div class="theme-option theme-green active" data-theme="green"></div>
+                <div class="theme-option theme-blue" data-theme="blue"></div>
+                <div class="theme-option theme-purple" data-theme="purple"></div>
+                <div class="theme-option theme-red" data-theme="red"></div>
+                <div class="theme-option theme-yellow" data-theme="yellow" title="Yellow"></div>
+                <div class="theme-option theme-gray" data-theme="gray" title="Gray"></div>
+            </div>
+        </div>
+        
+        <button onclick="closeSettings()" style="width: 100%; margin-top: 20px;">CLOSE</button>
+    </div>
+</div>
+
+<script>
+// Mobile Detection
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+const isSmallScreen = window.innerWidth <= 768;
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+// Core Variables
+let pc, dc;
+const cfg = { 
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" },
+        { urls: "stun:stun3.l.google.com:19302" },
+        { urls: "stun:stun4.l.google.com:19302" }
+    ],
+    iceCandidatePoolSize: 10
+};
+
+// State Management
+const state = {
+    messageHistory: [],
+    soundEnabled: !isMobile, // Disable sound by default on mobile
+    notificationsEnabled: false,
+    autoScroll: true,
+    showTimestamps: !isSmallScreen, // Hide timestamps on small screens by default
+    readReceipts: true,
+    typingTimeout: null,
+    connectionId: generateId(),
+    messageCount: 0,
+    connectionStartTime: null,
+    uptimeInterval: null,
+    dataSent: 0,
+    dataReceived: 0,
+    currentTheme: 'green',
+    searchMode: false,
+    editingMessageId: null,
+    messageReadStatus: new Map(),
+    isMobile: isMobile || isSmallScreen,
+    isTouchDevice: isTouchDevice
+};
+
+
+
+// Utility Functions
+function generateId() {
+    return Math.random().toString(36).substr(2, 9).toUpperCase();
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 KB';
+    const k = 1024;
+    return (bytes / k).toFixed(2) + ' KB';
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function toggleSetup() {
+    const setupContent = document.getElementById('setup-content');
+    setupContent.classList.toggle('open');
+    
+    // On mobile, scroll to top when opening setup
+    if (state.isMobile && setupContent.classList.contains('open')) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+// Message Functions
+function addMsg(user, txt, cls, msgId = null, options = {}) {
+    const log = document.getElementById('chat-log');
+    const d = document.createElement('div');
+    d.className = `msg ${cls}`;
+    if (msgId) d.dataset.msgId = msgId;
+    
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const timestamp = state.showTimestamps ? `<span class="timestamp">${time}</span>` : '';
+    
+    let content = '';
+    if (cls === 'system') {
+        content = txt;
+    } else {
+        const actions = cls === 'sent' ? `
+            <div class="msg-actions">
+                <button class="msg-action-btn" onclick="deleteMessage('${msgId}')" title="Delete message">🗑️</button>
+            </div>
+        ` : '';
+        
+        const readStatus = cls === 'sent' && state.readReceipts && state.messageReadStatus.get(msgId) 
+            ? '<span class="msg-status read">✓✓</span>' 
+            : cls === 'sent' && state.readReceipts 
+            ? '<span class="msg-status">✓</span>' 
+            : '';
+        
+        const edited = options.edited ? '<span class="msg-edited">(edited)</span>' : '';
+        
+        content = `
+            <div class="msg-header">
+                <strong>${user}:</strong>
+                ${actions}
+            </div>
+            ${escapeHtml(txt)}${edited}${readStatus}${timestamp}
+        `;
+    }
+    
+    d.innerHTML = content;
+    log.appendChild(d);
+    
+    if (state.autoScroll) {
+        log.scrollTop = log.scrollHeight;
+    }
+    
+    state.messageHistory.push({ user, text: txt, class: cls, time, id: msgId });
+    
+    // Desktop notification for received messages
+    if (cls === 'received' && state.notificationsEnabled && document.hidden) {
+        showDesktopNotification('New Message', txt);
+    }
+}
+
+function editMessage(msgId) {
+    const msgElement = document.querySelector(`[data-msg-id="${msgId}"]`);
+    if (!msgElement) return;
+    
+    const msgText = state.messageHistory.find(m => m.id === msgId)?.text;
+    if (!msgText) return;
+    
+    const input = document.getElementById('msg-input');
+    input.value = msgText;
+    input.focus();
+    
+    state.editingMessageId = msgId;
+    document.getElementById('send-btn').textContent = 'UPDATE';
+}
+
+function deleteMessage(msgId) {
+    if (!confirm('Delete this message?')) return;
+    
+    const msgElement = document.querySelector(`[data-msg-id="${msgId}"]`);
+    if (msgElement) {
+        msgElement.style.opacity = '0';
+        setTimeout(() => msgElement.remove(), 300);
+    }
+    
+    if (dc && dc.readyState === 'open') {
+        dc.send(JSON.stringify({
+            type: 'delete',
+            messageId: msgId
+        }));
+    }
+    
+    state.messageHistory = state.messageHistory.filter(m => m.id !== msgId);
+}
+
+function send() {
+    const input = document.getElementById('msg-input');
+    if (!input.value.trim() || !dc || dc.readyState !== "open") return;
+    
+    const msgId = state.editingMessageId || Date.now().toString();
+    const isEdit = !!state.editingMessageId;
+    
+    const msgData = {
+        type: isEdit ? 'edit' : 'message',
+        content: input.value,
+        timestamp: new Date().toISOString(),
+        id: msgId
+    };
+    
+    dc.send(JSON.stringify(msgData));
+    state.dataSent += JSON.stringify(msgData).length;
+    updateDataStats();
+    
+    if (isEdit) {
+        const msgElement = document.querySelector(`[data-msg-id="${msgId}"]`);
+        if (msgElement) {
+            msgElement.innerHTML = msgElement.innerHTML.replace(
+                /<strong>You:<\/strong>.*?(<span|$)/,
+                `<strong>You:</strong> ${escapeHtml(input.value)}<span class="msg-edited">(edited)</span>$1`
+            );
+        }
+        state.editingMessageId = null;
+        document.getElementById('send-btn').textContent = 'SEND';
+    } else {
+        addMsg("You", input.value, "sent", msgId);
+        state.messageCount++;
+        updateMessageCount();
+    }
+    
+    playSound(500, 0.05);
+    input.value = "";
+}
+
+// File Handling
+function sendFile() {
+    const fileInput = document.getElementById('file-input');
+    const files = Array.from(fileInput.files);
+    if (files.length === 0 || !dc || dc.readyState !== "open") return;
+    
+    files.forEach(file => {
+        if (file.size > 16 * 1024 * 1024) {
+            showNotification(`❌ File too large: ${file.name} (Max 16MB)`);
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = e => {
+            const fileData = {
+                type: 'file',
+                name: file.name,
+                size: file.size,
+                mimeType: file.type,
+                data: e.target.result,
+                id: Date.now().toString()
+            };
+            dc.send(JSON.stringify(fileData));
+            state.dataSent += JSON.stringify(fileData).length;
+            updateDataStats();
+            
+            addFileMsg("You", file.name, file.size, "sent");
+            state.messageCount++;
+            updateMessageCount();
+            playSound(550, 0.08);
+            showNotification("✓ File sent: " + file.name);
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    fileInput.value = "";
+}
+
+function receiveFile(fileData) {
+    addFileMsg("Them", fileData.name, fileData.size, "received", fileData.data);
+    showNotification("📎 File received: " + fileData.name);
+}
+
+function addFileMsg(user, fileName, fileSize, cls, fileData = null) {
+    const log = document.getElementById('chat-log');
+    const d = document.createElement('div');
+    d.className = `msg ${cls}`;
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const sizeKB = (fileSize / 1024).toFixed(1);
+    const timestamp = state.showTimestamps ? `<span class="timestamp">${time}</span>` : '';
+    
+    let content = `<div class="file-msg"><span class="file-icon">📄</span><div><strong>${user}:</strong> ${escapeHtml(fileName)} (${sizeKB}KB)`;
+    if (fileData) {
+        content += `<br><span class="file-download" onclick="downloadFile('${fileData}', '${fileName}')">⬇ Download</span>`;
+    }
+    content += `</div></div>${timestamp}`;
+    
+    d.innerHTML = content;
+    log.appendChild(d);
+    
+    if (state.autoScroll) {
+        log.scrollTop = log.scrollHeight;
+    }
+    
+    state.messageHistory.push({ user, text: `[FILE: ${fileName}]`, class: cls, time });
+}
+
+function downloadFile(dataUrl, fileName) {
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = fileName;
+    a.click();
+}
+
+// Connection Setup
+function setupPC() {
+    pc = new RTCPeerConnection(cfg);
+    
+    pc.onicecandidate = e => {
+        if (!e.candidate) {
+            const sdp = btoa(JSON.stringify(pc.localDescription));
+            if (pc.localDescription.type === 'offer') {
+                document.getElementById('off-out').value = sdp;
+            } else {
+                document.getElementById('ans-out').value = sdp;
+                document.getElementById('answer-area').style.display = 'block';
+            }
+        }
+    };
+    
+    pc.ondatachannel = e => { 
+        dc = e.channel; 
+        setupDC(); 
+    };
+    
+    pc.oniceconnectionstatechange = () => {
+        console.log('ICE connection state:', pc.iceConnectionState);
+        if (pc.iceConnectionState === 'failed' || pc.iceConnectionState === 'disconnected') {
+            showNotification('⚠️ Connection unstable');
+        }
+    };
+    
+    document.getElementById('conn-id').textContent = state.connectionId;
+}
+
+async function createOffer() {
+    setupPC();
+    dc = pc.createDataChannel("chat", { ordered: true });
+    setupDC();
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+}
+
+async function acceptOffer() {
+    const input = document.getElementById('off-in').value.trim();
+    if (!input) {
+        showNotification("⚠️ Please paste the host's code first");
+        return;
+    }
+    
+    try {
+        setupPC();
+        await pc.setRemoteDescription(JSON.parse(atob(input)));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        addMsg("System", "✓ Response generated - send it back to host", "system");
+    } catch(e) {
+        showNotification("❌ Invalid code. Please check and try again.");
+        console.error(e);
+    }
+}
+
+async function finalize() {
+    const input = document.getElementById('ans-in').value.trim();
+    if (!input) {
+        showNotification("⚠️ Please paste the peer's response code first");
+        return;
+    }
+    
+    try {
+        await pc.setRemoteDescription(JSON.parse(atob(input)));
+        addMsg("System", "⏳ Finalizing connection...", "system");
+    } catch(e) {
+        showNotification("❌ Invalid response code. Please check and try again.");
+        console.error(e);
+    }
+}
+
+function setupDC() {
+    dc.onopen = () => {
+        document.getElementById('status-dot').classList.add('online');
+        
+        // Auto-close setup on mobile after brief delay
+        if (state.isMobile) {
+            setTimeout(() => {
+                document.getElementById('setup-content').classList.remove('open');
+            }, 1500);
+        } else {
+            document.getElementById('setup-content').classList.remove('open');
+        }
+        
+        enableChat();
+        state.connectionStartTime = Date.now();
+        startUptimeCounter();
+        addMsg("System", "🔒 SECURE CONNECTION ESTABLISHED", "system");
+        playSound(800, 0.1);
+        startPingMonitor();
+        showNotification("✓ Connected securely");
+        
+        // Focus input on desktop, but not on mobile (to avoid keyboard popup)
+        if (!state.isMobile) {
+            document.getElementById('msg-input').focus();
+        }
+    };
+    
+    dc.onmessage = e => {
+        const data = JSON.parse(e.data);
+        state.dataReceived += e.data.length;
+        updateDataStats();
+        
+        if (data.type === 'message') {
+            addMsg("Them", data.content, "received", data.id);
+            state.messageCount++;
+            updateMessageCount();
+            playSound(600, 0.05);
+            
+            // Send read receipt
+            if (state.readReceipts) {
+                setTimeout(() => {
+                    dc.send(JSON.stringify({ type: 'read', messageId: data.id }));
+                }, 500);
+            }
+        } else if (data.type === 'edit') {
+            const msgElement = document.querySelector(`[data-msg-id="${data.id}"]`);
+            if (msgElement) {
+                msgElement.innerHTML = msgElement.innerHTML.replace(
+                    /<strong>Them:<\/strong>.*?(<span|$)/,
+                    `<strong>Them:</strong> ${escapeHtml(data.content)}<span class="msg-edited">(edited)</span>$1`
+                );
+            }
+        } else if (data.type === 'delete') {
+            const msgElement = document.querySelector(`[data-msg-id="${data.messageId}"]`);
+            if (msgElement) {
+                msgElement.style.opacity = '0';
+                setTimeout(() => msgElement.remove(), 300);
+            }
+        } else if (data.type === 'file') {
+            receiveFile(data);
+            state.messageCount++;
+            updateMessageCount();
+            playSound(700, 0.08);
+        } else if (data.type === 'typing') {
+            showTyping();
+        } else if (data.type === 'ping') {
+            dc.send(JSON.stringify({ type: 'pong', time: data.time }));
+        } else if (data.type === 'pong') {
+            const latency = Date.now() - data.time;
+            document.getElementById('latency').textContent = latency;
+        } else if (data.type === 'read') {
+            state.messageReadStatus.set(data.messageId, true);
+            const msgElement = document.querySelector(`[data-msg-id="${data.messageId}"]`);
+            if (msgElement) {
+                const statusSpan = msgElement.querySelector('.msg-status');
+                if (statusSpan) {
+                    statusSpan.classList.add('read');
+                    statusSpan.textContent = '✓✓';
+                }
+            }
+        }
+    };
+    
+    dc.onclose = () => {
+        document.getElementById('status-dot').classList.remove('online');
+        disableChat();
+        if (state.uptimeInterval) clearInterval(state.uptimeInterval);
+        addMsg("System", "❌ CONNECTION LOST", "system");
+        showNotification("❌ Connection lost");
+    };
+}
+
+function enableChat() {
+    document.getElementById('msg-input').disabled = false;
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('file-btn').disabled = false;
+    
+    // Only auto-focus on desktop to avoid keyboard popup on mobile
+    if (!state.isMobile) {
+        document.getElementById('msg-input').focus();
+    }
+}
+
+function disableChat() {
+    document.getElementById('msg-input').disabled = true;
+    document.getElementById('send-btn').disabled = true;
+    document.getElementById('file-btn').disabled = true;
+}
+
+// Utility Functions
+function copyKey(elementId) {
+    const elem = document.getElementById(elementId);
+    elem.select();
+    navigator.clipboard.writeText(elem.value);
+    showNotification("✓ Copied to clipboard!");
+    playSound(600, 0.1);
+}
+
+function generateQR(elementId) {
+    const data = document.getElementById(elementId).value;
+    if (!data) {
+        showNotification("⚠️ No data to generate QR code");
+        return;
+    }
+    
+    // Simple QR code generation using a free API
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(data)}`;
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;z-index:3000;padding:20px;';
+    
+    const modalContent = state.isMobile ? `
+        <div style="background:var(--panel);padding:15px;border:1px solid var(--neon);border-radius:4px;text-align:center;max-width:100%;width:100%;">
+            <h3 style="color:var(--neon);margin-bottom:12px;font-size:0.9rem;">SCAN QR CODE</h3>
+            <img src="${qrUrl}" style="max-width:100%;width:250px;border:2px solid var(--neon);">
+            <br><button onclick="this.parentElement.parentElement.remove()" style="margin-top:12px;width:100%;">CLOSE</button>
+        </div>
+    ` : `
+        <div style="background:var(--panel);padding:20px;border:1px solid var(--neon);border-radius:4px;text-align:center;">
+            <h3 style="color:var(--neon);margin-bottom:15px;">SCAN QR CODE</h3>
+            <img src="${qrUrl}" style="max-width:300px;border:2px solid var(--neon);">
+            <br><button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px;width:100%;">CLOSE</button>
+        </div>
+    `;
+    
+    modal.innerHTML = modalContent;
+    document.body.appendChild(modal);
+    
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function clearChat() {
+    if (!confirm("Clear all messages? This cannot be undone.")) return;
+    document.getElementById('chat-log').innerHTML = '<div class="msg system">Chat cleared</div>';
+    state.messageHistory = [];
+    state.messageCount = 0;
+    updateMessageCount();
+    showNotification("🗑️ Chat cleared");
+}
+
+function exportChat() {
+    let text = `=== Secured-Velchat Pro Export ===\n`;
+    text += `Connection ID: ${state.connectionId}\n`;
+    text += `Export Time: ${new Date().toLocaleString()}\n`;
+    text += `Total Messages: ${state.messageCount}\n`;
+    text += `Data Sent: ${formatBytes(state.dataSent)}\n`;
+    text += `Data Received: ${formatBytes(state.dataReceived)}\n`;
+    text += `\n--- Messages ---\n\n`;
+    text += state.messageHistory.map(m => `[${m.time}] ${m.user}: ${m.text}`).join('\n');
+    
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `velchat-pro_${state.connectionId}_${new Date().toISOString().slice(0,10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    addMsg("System", "💾 Chat exported successfully", "system");
+    showNotification("💾 Chat exported");
+}
+
+function playSound(freq, duration) {
+    if (!state.soundEnabled) return;
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        oscillator.frequency.value = freq;
+        oscillator.type = 'sine';
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        
+        oscillator.start(audioCtx.currentTime);
+        oscillator.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+}
+
+function showTyping() {
+    const indicator = document.getElementById('typing-indicator');
+    indicator.innerHTML = '💬 Peer is typing<span class="typing-dots"><span></span><span></span><span></span></span>';
+    clearTimeout(state.typingTimeout);
+    state.typingTimeout = setTimeout(() => { indicator.innerHTML = ''; }, 2000);
+}
+
+function showNotification(text) {
+    const notif = document.createElement('div');
+    notif.className = 'notification';
+    notif.textContent = text;
+    document.body.appendChild(notif);
+    
+    // Shorter duration on mobile for better UX
+    const duration = state.isMobile ? 2000 : 3000;
+    setTimeout(() => {
+        notif.style.opacity = '0';
+        notif.style.transform = 'translateX(400px)';
+        setTimeout(() => notif.remove(), 300);
+    }, duration);
+}
+
+function showDesktopNotification(title, body) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body, icon: '🔒' });
+    }
+}
+
+function startPingMonitor() {
+    setInterval(() => {
+        if (dc && dc.readyState === 'open') {
+            dc.send(JSON.stringify({ type: 'ping', time: Date.now() }));
+        }
+    }, 3000);
+}
+
+function updateMessageCount() {
+    document.getElementById('msg-count').textContent = state.messageCount;
+}
+
+function updateDataStats() {
+    document.getElementById('data-sent').textContent = formatBytes(state.dataSent);
+    document.getElementById('data-received').textContent = formatBytes(state.dataReceived);
+}
+
+function startUptimeCounter() {
+    state.uptimeInterval = setInterval(() => {
+        if (state.connectionStartTime) {
+            const uptime = Date.now() - state.connectionStartTime;
+            const hours = Math.floor(uptime / 3600000);
+            const minutes = Math.floor((uptime % 3600000) / 60000);
+            const seconds = Math.floor((uptime % 60000) / 1000);
+            
+            let uptimeStr = '';
+            if (hours > 0) uptimeStr += `${hours}h `;
+            uptimeStr += `${minutes}m ${seconds}s`;
+            
+            document.getElementById('uptime').textContent = uptimeStr;
+        }
+    }, 1000);
+}
+
+function panicButton() {
+    if (!confirm("⚠️ EMERGENCY PURGE\n\nThis will:\n• Close connection\n• Clear all messages\n• Delete all data\n• Reset application\n\nProceed?")) return;
+    
+    // Close connections
+    if (dc) { dc.close(); dc = null; }
+    if (pc) { pc.close(); pc = null; }
+    
+    // Clear all inputs
+    ['off-out', 'off-in', 'ans-out', 'ans-in', 'msg-input'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    
+    // Clear chat
+    document.getElementById('chat-log').innerHTML = '<div class="msg system">🔥 EMERGENCY PURGE COMPLETED - All data destroyed</div>';
+    state.messageHistory = [];
+    
+    // Reset UI
+    document.getElementById('status-dot').classList.remove('online');
+    document.getElementById('conn-id').textContent = '---';
+    document.getElementById('latency').textContent = '---';
+    document.getElementById('msg-count').textContent = '0';
+    document.getElementById('uptime').textContent = '---';
+    document.getElementById('data-sent').textContent = '0 KB';
+    document.getElementById('data-received').textContent = '0 KB';
+    
+    // Clear intervals
+    if (state.uptimeInterval) clearInterval(state.uptimeInterval);
+    
+    // Reset state
+    state.connectionId = generateId();
+    state.messageCount = 0;
+    state.dataSent = 0;
+    state.dataReceived = 0;
+    state.messageReadStatus.clear();
+    
+    disableChat();
+    playSound(300, 0.3);
+    showNotification("🔥 Emergency purge completed");
+}
+
+// Settings Functions
+function openSettings() {
+    document.getElementById('settings-modal').classList.add('show');
+}
+
+function closeSettings() {
+    document.getElementById('settings-modal').classList.remove('show');
+}
+
+function toggleSetting(toggleId, statusId, property) {
+    const toggle = document.getElementById(toggleId);
+    const status = document.getElementById(statusId);
+    
+    toggle.classList.toggle('on');
+    state[property] = !state[property];
+    status.textContent = state[property] ? 'Enabled' : 'Disabled';
+    
+    if (property === 'notificationsEnabled' && state.notificationsEnabled) {
+        if ('Notification' in window && Notification.permission !== 'granted') {
+            Notification.requestPermission().then(permission => {
+                if (permission !== 'granted') {
+                    state.notificationsEnabled = false;
+                    toggle.classList.remove('on');
+                    status.textContent = 'Disabled';
+                    showNotification('❌ Notification permission denied');
+                }
+            });
+        }
+    }
+}
+
+function setTheme(theme) {
+    const colors = {
+        green: '#00ff41',
+        blue: '#00d4ff',
+        purple: '#b800ff',
+        red: '#ff4141',
+        teal: '#00d4b4',
+        orange: '#ff8c2b',
+        pink: '#ff3fa1',
+        yellow: '#ffd400',
+        gray: '#9a9aa0'
+    };
+    
+    document.documentElement.style.setProperty('--neon', colors[theme]);
+    state.currentTheme = theme;
+    
+    document.querySelectorAll('.theme-option').forEach(opt => {
+        opt.classList.remove('active');
+    });
+    document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
+}
+
+// Search Function
+function searchMessages() {
+    if (state.searchMode) {
+        // Exit search mode
+        state.searchMode = false;
+        document.querySelectorAll('.msg').forEach(msg => msg.classList.remove('highlight'));
+        const searchBox = document.querySelector('.search-box');
+        if (searchBox) searchBox.remove();
+        return;
+    }
+    
+    state.searchMode = true;
+    const chatLog = document.getElementById('chat-log');
+    
+    const searchBox = document.createElement('input');
+    searchBox.className = 'search-box';
+    searchBox.placeholder = 'Search messages...';
+    chatLog.insertBefore(searchBox, chatLog.firstChild);
+    searchBox.focus();
+    
+    searchBox.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('.msg').forEach(msg => {
+            msg.classList.remove('highlight');
+            if (query && msg.textContent.toLowerCase().includes(query)) {
+                msg.classList.add('highlight');
+            }
+        });
+    });
+}
+
+
+
+// Event Listeners
+document.getElementById('host-btn').addEventListener('click', () => {
+    document.getElementById('host-section').style.display = 'block';
+    document.getElementById('join-section').style.display = 'none';
+    document.getElementById('finalize-section').style.display = 'block';
+    createOffer();
+    addMsg("System", "🖥️ HOST MODE - Share your code with peer", "system");
+});
+
+document.getElementById('join-btn').addEventListener('click', () => {
+    document.getElementById('host-section').style.display = 'none';
+    document.getElementById('join-section').style.display = 'block';
+    document.getElementById('finalize-section').style.display = 'none';
+    addMsg("System", "📱 JOIN MODE - Paste host's code and connect", "system");
+});
+
+document.getElementById('connect-btn').addEventListener('click', acceptOffer);
+document.getElementById('complete-btn').addEventListener('click', finalize);
+document.getElementById('send-btn').addEventListener('click', send);
+document.getElementById('file-btn').addEventListener('click', () => document.getElementById('file-input').click());
+document.getElementById('file-input').addEventListener('change', sendFile);
+document.getElementById('search-btn').addEventListener('click', searchMessages);
+document.getElementById('clear-btn').addEventListener('click', clearChat);
+document.getElementById('export-btn').addEventListener('click', exportChat);
+document.getElementById('settings-btn').addEventListener('click', openSettings);
+document.getElementById('panic-btn').addEventListener('click', panicButton);
+
+document.getElementById('msg-input').addEventListener('keypress', e => {
+    if (e.key === 'Enter' && !e.shiftKey && !state.isMobile) {
+        e.preventDefault();
+        send();
+    }
+});
+
+document.getElementById('msg-input').addEventListener('input', () => {
+    if (dc && dc.readyState === 'open') {
+        dc.send(JSON.stringify({ type: 'typing' }));
+    }
+});
+
+// Settings event listeners
+document.getElementById('sound-toggle').addEventListener('click', () => {
+    toggleSetting('sound-toggle', 'sound-status', 'soundEnabled');
+    playSound(600, 0.1);
+});
+
+document.getElementById('autoscroll-toggle').addEventListener('click', () => {
+    toggleSetting('autoscroll-toggle', 'autoscroll-status', 'autoScroll');
+});
+
+document.getElementById('timestamp-toggle').addEventListener('click', () => {
+    toggleSetting('timestamp-toggle', 'timestamp-status', 'showTimestamps');
+});
+
+document.getElementById('read-receipt-toggle').addEventListener('click', () => {
+    toggleSetting('read-receipt-toggle', 'read-receipt-status', 'readReceipts');
+});
+
+document.querySelectorAll('.theme-option').forEach(option => {
+    option.addEventListener('click', () => {
+        setTheme(option.dataset.theme);
+    });
+});
+
+// Close settings modal when clicking outside
+document.getElementById('settings-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('settings-modal')) {
+        closeSettings();
+    }
+});
+
+// Scroll-to-bottom button
+const scrollBtn = document.getElementById('scroll-to-bottom');
+const chatLog = document.getElementById('chat-log');
+chatLog.addEventListener('scroll', () => {
+    const distFromBottom = chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight;
+    if (distFromBottom > 150) {
+        scrollBtn.classList.add('visible');
+        state.autoScroll = false;
+    } else {
+        scrollBtn.classList.remove('visible');
+        state.autoScroll = true;
+    }
+});
+scrollBtn.addEventListener('click', () => {
+    chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: 'smooth' });
+    state.autoScroll = true;
+});
+
+// Mobile-specific initialization
+function initMobileOptimizations() {
+    if (state.isMobile) {
+        console.log('📱 Mobile device detected - applying optimizations');
+        
+        // Simplify connection info on very small screens
+        if (window.innerWidth <= 480) {
+            const connInfo = document.querySelector('.connection-info');
+            if (connInfo) {
+                connInfo.style.gridTemplateColumns = '1fr 1fr';
+            }
+        }
+        
+        // Add mobile-specific event listeners
+        let touchStartY = 0;
+        const chatLog = document.getElementById('chat-log');
+        
+        chatLog.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+        
+        // Prevent overscroll
+        chatLog.addEventListener('touchmove', (e) => {
+            const scrollTop = chatLog.scrollTop;
+            const scrollHeight = chatLog.scrollHeight;
+            const height = chatLog.clientHeight;
+            const delta = e.touches[0].clientY - touchStartY;
+            
+            if ((scrollTop === 0 && delta > 0) || (scrollTop + height >= scrollHeight && delta < 0)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Optimize message rendering for mobile
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    // Could implement virtual scrolling here for performance
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Move action buttons into a compact mobile menu (keep file button next to input)
+        if (state.isMobile) {
+            try {
+                const mobileMenu = document.getElementById('mobile-action-menu');
+                const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+                const headerRight = document.querySelector('.header-right');
+
+                // Buttons to move into the mobile menu (exclude file and panic)
+                ['search-btn','clear-btn','export-btn','settings-btn'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && mobileMenu) {
+                        mobileMenu.appendChild(el);
+                        // Style the button for the menu
+                        el.style.width = '100%';
+                        el.style.padding = '8px 10px';
+                        el.style.fontSize = '0.75rem';
+                    }
+                });
+
+                // Move the panic button to the header-right area (BEFORE the menu button)
+                const panicBtn = document.getElementById('panic-btn');
+                const panicTopBtn = document.getElementById('panic-top-btn');
+                if (panicTopBtn && headerRight) {
+                    // Make it visible and ensure it appears before the menu button
+                    panicTopBtn.style.display = 'inline-flex';
+                    panicTopBtn.style.alignItems = 'center';
+                    panicTopBtn.style.padding = '6px 8px';
+                    panicTopBtn.style.fontSize = '0.9rem';
+                    
+                    // Add event listener to the top panic button
+                    panicTopBtn.addEventListener('click', panicButton);
+                }
+
+                // Move file button just left of the message input
+                const fileBtn = document.getElementById('file-btn');
+                const msgInput = document.getElementById('msg-input');
+                if (fileBtn && msgInput) {
+                    // Adjust display to be icon-only on mobile via CSS .btn-text hidden
+                    msgInput.parentElement.insertBefore(fileBtn, msgInput);
+                }
+
+                // Add tutorial link to mobile menu
+                const tutorialMobileBtn = document.createElement('a');
+                tutorialMobileBtn.href = 'tutorial.html';
+                tutorialMobileBtn.target = '_blank';
+                tutorialMobileBtn.textContent = '? GUIDE';
+                tutorialMobileBtn.className = 'tutorial-btn';
+                tutorialMobileBtn.style.width = '100%';
+                tutorialMobileBtn.style.padding = '8px 10px';
+                tutorialMobileBtn.style.fontSize = '0.75rem';
+                tutorialMobileBtn.style.justifyContent = 'center';
+                if (mobileMenu) mobileMenu.appendChild(tutorialMobileBtn);
+
+                // Mobile menu toggle behavior
+                if (mobileMenuBtn && mobileMenu) {
+                    mobileMenuBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        mobileMenu.classList.toggle('show');
+                        mobileMenu.setAttribute('aria-hidden', mobileMenu.classList.contains('show') ? 'false' : 'true');
+                    });
+
+                    // Close menu when tapping outside
+                    document.addEventListener('click', (e) => {
+                        if (!mobileMenu.contains(e.target) && e.target !== mobileMenuBtn) {
+                            mobileMenu.classList.remove('show');
+                            mobileMenu.setAttribute('aria-hidden', 'true');
+                        }
+                    });
+                }
+            } catch (e) { console.error('Mobile UI move failed', e); }
+        }
+        
+        // Auto-hide setup panel after connection on mobile
+        if (dc && dc.readyState === 'open') {
+            setTimeout(() => {
+                document.getElementById('setup-content').classList.remove('open');
+            }, 2000);
+        }
+    }
+}
+
+// Handle orientation changes
+function handleOrientationChange() {
+    if (state.isMobile) {
+        const chatLog = document.getElementById('chat-log');
+        setTimeout(() => {
+            if (state.autoScroll) {
+                chatLog.scrollTop = chatLog.scrollHeight;
+            }
+        }, 300);
+    }
+}
+
+window.addEventListener('orientationchange', handleOrientationChange);
+window.addEventListener('resize', handleOrientationChange);
+
+// Double-tap zoom prevention removed for better UX
+
+// Initialize
+initMobileOptimizations();
+
+console.log('🔒 Secured-Velchat Pro initialized');
+console.log(`📱 Platform: ${state.isMobile ? 'Mobile' : 'Desktop'}`);
+console.log(`👆 Touch Device: ${state.isTouchDevice ? 'Yes' : 'No'}`);
+</script>
+
+</body>
+</html>

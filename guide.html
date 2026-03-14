@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velchat — How to Use</title>
+  <style>
+    :root {
+      --neon: #00ff41;
+      --neon-dim: rgba(0,255,65,0.1);
+      --bg: #0a0a0a;
+      --panel: #141414;
+      --border: #222;
+      --text: #c8c8c8;
+      --muted: #666;
+      --danger: #ff4141;
+      --blue: #00d4ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', monospace;
+      line-height: 1.7;
+      padding: 0 20px 80px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 0 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badge {
+      display: inline-block;
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      font-size: 0.62rem;
+      padding: 3px 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      color: #fff;
+      font-weight: normal;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    h1 span { color: var(--neon); }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 0.85rem;
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    /* ── LAYOUT ── */
+    .content { max-width: 720px; margin: 0 auto; }
+
+    /* ── SECTION TITLES ── */
+    .section-title {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin: 52px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── HIGHLIGHT BOX ── */
+    .highlight {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--neon);
+      border-radius: 0 3px 3px 0;
+      padding: 18px 20px;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .highlight b { color: var(--neon); font-weight: normal; }
+
+    /* ── STEP CARDS ── */
+    .steps { display: flex; flex-direction: column; gap: 2px; }
+
+    .step {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .step:hover { border-color: #2e2e2e; }
+
+    .step-num {
+      background: var(--neon-dim);
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 22px;
+      font-size: 1.05rem;
+      color: var(--neon);
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .step-body { padding: 20px 22px; }
+
+    .step-label {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .step-title {
+      color: #fff;
+      font-size: 0.93rem;
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 0.8rem;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .step-desc b { color: var(--neon); font-weight: normal; }
+    .step-desc em { color: var(--blue); font-style: normal; }
+
+    /* ── ROLE COLUMNS ── */
+    .roles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    @media (max-width: 520px) { .roles { grid-template-columns: 1fr; } }
+
+    .role-card { border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+
+    .role-header {
+      padding: 10px 16px;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .role-host .role-header {
+      background: rgba(0,255,65,0.08);
+      color: var(--neon);
+      border-bottom: 1px solid rgba(0,255,65,0.2);
+    }
+    .role-peer .role-header {
+      background: rgba(0,212,255,0.08);
+      color: var(--blue);
+      border-bottom: 1px solid rgba(0,212,255,0.2);
+    }
+
+    .role-steps { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    .role-step { display: flex; gap: 10px; font-size: 0.78rem; align-items: flex-start; }
+
+    .role-step-n {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .role-host .role-step-n { background: rgba(0,255,65,0.12); color: var(--neon); border: 1px solid rgba(0,255,65,0.3); }
+    .role-peer .role-step-n { background: rgba(0,212,255,0.1); color: var(--blue); border: 1px solid rgba(0,212,255,0.25); }
+
+    .role-host .role-step b { font-weight: normal; color: var(--neon); }
+    .role-peer .role-step b { font-weight: normal; color: var(--blue); }
+
+    /* ── TIP / WARN ── */
+    .tip {
+      border-left: 3px solid var(--neon);
+      background: var(--neon-dim);
+      padding: 14px 18px;
+      font-size: 0.8rem;
+      border-radius: 0 3px 3px 0;
+      margin-top: 16px;
+      line-height: 1.65;
+    }
+    .tip-label {
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--neon);
+      margin-bottom: 5px;
+    }
+    .tip b { color: var(--neon); font-weight: normal; }
+
+    .warn {
+      border-left: 3px solid var(--danger);
+      background: rgba(255,65,65,0.06);
+      padding: 14px 18px;
+      font-size: 0.8rem;
+      border-radius: 0 3px 3px 0;
+      margin-top: 16px;
+      line-height: 1.65;
+    }
+    .warn-label {
+      font-size: 0.58rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--danger);
+      margin-bottom: 5px;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .feat {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 16px;
+      transition: border-color 0.2s;
+    }
+    .feat:hover { border-color: #2e2e2e; }
+    .feat-icon { font-size: 1.3rem; margin-bottom: 8px; display: block; }
+    .feat-name { color: #fff; font-size: 0.8rem; margin-bottom: 4px; }
+    .feat-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── PANIC ── */
+    .panic-box {
+      border: 1px solid rgba(255,65,65,0.3);
+      background: rgba(255,65,65,0.05);
+      border-radius: 3px;
+      padding: 20px 22px;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .panic-icon { font-size: 2rem; flex-shrink: 0; }
+    .panic-text h3 { color: var(--danger); font-size: 0.88rem; margin-bottom: 6px; font-weight: normal; }
+    .panic-text p { font-size: 0.78rem; line-height: 1.65; }
+
+    /* ── FAQ ── */
+    .faq { display: flex; flex-direction: column; gap: 2px; }
+
+    .faq-item { border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+
+    .faq-q {
+      padding: 14px 18px;
+      background: var(--panel);
+      color: #ddd;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .faq-q:hover { background: #181818; }
+    .faq-q::after { content: '+'; color: var(--neon); font-size: 1.1rem; flex-shrink: 0; transition: transform 0.25s; }
+    .faq-item.open .faq-q::after { transform: rotate(45deg); }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s;
+      font-size: 0.78rem;
+      background: #0f0f0f;
+      padding: 0 18px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .faq-item.open .faq-a { max-height: 220px; padding: 14px 18px; }
+
+    /* ── FOOTER ── */
+    .footer {
+      max-width: 720px;
+      margin: 60px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .dot-online {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--neon);
+      box-shadow: 0 0 6px var(--neon);
+      animation: pulse 2s infinite;
+      vertical-align: middle;
+      margin-right: 2px;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">📖 How to Use</div>
+  <h1>Chat with <span>Velchat</span></h1>
+  <p class="hero-sub">No account. No download. Just open the site, share a one-time code with someone, and start chatting — encrypted directly between your browsers.</p>
+</div>
+
+<div class="content">
+
+  <!-- HOW IT WORKS -->
+  <div class="section-title">How it works</div>
+
+  <div class="highlight">
+    Velchat connects your browser <b>directly</b> to another person's browser — no server in the middle, no message storage, ever. Both of you visit this site. One person is the <b>Host</b>, the other the <b>Peer</b>. You swap a short one-time code to link up (via WhatsApp, Telegram, iMessage — anything). Once connected, the site is no longer involved. You're talking directly.
+  </div>
+
+  <div class="tip" style="margin-top:12px;">
+    <div class="tip-label">💡 Think of it like this</div>
+    The code exchange is a one-time handshake. After that, your messages travel directly between browsers — like a private phone call. The website just helped you dial.
+  </div>
+
+  <!-- HOW TO CONNECT -->
+  <div class="section-title">Connecting — step by step</div>
+
+  <p style="font-size:0.82rem; margin-bottom:20px; color:var(--muted);">
+    Agree with the other person on who is Host and who is Peer — it doesn't matter which. Then follow the steps for your role. Keep a messaging app (WhatsApp, Telegram, etc.) open on the side to pass the codes between you.
+  </p>
+
+  <div class="roles">
+    <div class="role-card role-host">
+      <div class="role-header">🖥️ You are the Host</div>
+      <div class="role-steps">
+        <div class="role-step">
+          <div class="role-step-n">1</div>
+          <div>Click <b>"I'M HOST"</b> at the top of the page</div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-n">2</div>
+          <div>A code appears in the box. Click <b>"COPY"</b></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-n">3</div>
+          <div>Send that code to the Peer over any messaging app</div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-n">4</div>
+          <div>Wait for the Peer to send you back their response code</div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-n">5</div>
+          <div>Paste their code in the <b>"Paste peer's answer"</b> box and click <b>"COMPLETE CONNECTION"</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="role-card role-peer">
+      <div class="role-header">📱 You are the Peer</div>
+      <div class="role-steps">
+        <div class="role-step">
+          <div class="role-step-n">1</div>
+          <div>Click <b>"I'M JOINING"</b> at the top of the page</div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-n">2</div>
+          <div>Paste the Host's code into the box that appears</div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-n">3</div>
+          <div>Click <b>"CONNECT"</b> — your response code will appear</div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-n">4</div>
+          <div>Click <b>"COPY"</b> and send that code back to the Host</div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-n">5</div>
+          <div>You're done — once the Host completes their side, chat opens automatically ✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-label">✓ How you know it worked</div>
+    The small circle in the top-left turns <b>solid green and glows</b> <span class="dot-online"></span>. The message input at the bottom becomes active. You'll see a system message in the chat confirming the encrypted connection is live.
+  </div>
+
+  <!-- CHATTING -->
+  <div class="section-title">Sending messages & files</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">✍</div>
+      <div class="step-body">
+        <div class="step-label">Messages</div>
+        <div class="step-title">Type and hit Send</div>
+        <div class="step-desc">Type in the box at the bottom. Press <b>SEND</b> or hit <b>Enter</b> on a keyboard. On mobile, tap the Send button. Your messages appear on the right in <b>green</b>, theirs on the left in grey.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">📎</div>
+      <div class="step-body">
+        <div class="step-label">Files</div>
+        <div class="step-title">Send photos, docs, or any file up to 16MB</div>
+        <div class="step-desc">Click <b>📎 FILE</b> and choose a file from your device. The other person receives a download link directly in chat. The file goes straight to their browser — never through a server.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">🗑</div>
+      <div class="step-body">
+        <div class="step-label">Delete</div>
+        <div class="step-title">Remove a message you sent</div>
+        <div class="step-desc">On <em>desktop</em>: hover over your sent message to reveal the delete button. On <em>mobile</em>: tap the message. It disappears from both sides of the conversation.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXTRA FEATURES -->
+  <div class="section-title">More features</div>
+
+  <div class="features">
+    <div class="feat">
+      <span class="feat-icon">🔍</span>
+      <div class="feat-name">Search</div>
+      <div class="feat-desc">Find any word or phrase in the current session's chat history.</div>
+    </div>
+    <div class="feat">
+      <span class="feat-icon">💾</span>
+      <div class="feat-name">Export Chat</div>
+      <div class="feat-desc">Save a copy of the conversation to your device before closing the tab.</div>
+    </div>
+    <div class="feat">
+      <span class="feat-icon">🗑️</span>
+      <div class="feat-name">Clear Chat</div>
+      <div class="feat-desc">Wipe messages from your screen while keeping the connection open.</div>
+    </div>
+    <div class="feat">
+      <span class="feat-icon">📱</span>
+      <div class="feat-name">QR Code</div>
+      <div class="feat-desc">Scan a QR code with your camera instead of copy-pasting the connection code.</div>
+    </div>
+    <div class="feat">
+      <span class="feat-icon">⚙️</span>
+      <div class="feat-name">Settings</div>
+      <div class="feat-desc">Toggle sounds, timestamps, read receipts, and pick a theme color.</div>
+    </div>
+    <div class="feat">
+      <span class="feat-icon">↓</span>
+      <div class="feat-name">Scroll Button</div>
+      <div class="feat-desc">Scroll up to read old messages — tap the button to jump back to the latest.</div>
+    </div>
+  </div>
+
+  <!-- PANIC -->
+  <div class="section-title">Emergency — Panic Button</div>
+
+  <div class="panic-box">
+    <div class="panic-icon">⚠️</div>
+    <div class="panic-text">
+      <h3>Instant wipe — one click</h3>
+      <p>The <strong style="color:var(--danger)">⚠️ PANIC</strong> button (top-right on desktop, in the header on mobile) immediately cuts the connection, wipes every message from memory, and reloads the page — leaving nothing behind. Use it any time you need to erase the conversation instantly.</p>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section-title">Common questions</div>
+
+  <div class="faq">
+
+    <div class="faq-item">
+      <div class="faq-q">Why do I have to exchange a code? Can't it connect automatically?</div>
+      <div class="faq-a">Because there's no server doing the introduction for you. Most chat apps use a central server to connect two users behind the scenes. Velchat skips that entirely — so you pass the introduction data yourself. It's a one-time thing per session and takes about 30 seconds.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Are my messages stored anywhere on the site?</div>
+      <div class="faq-a">No. Messages are never sent to or stored on any server. They live only in your browser's memory while the tab is open. Close or refresh the tab and everything is permanently gone.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Is it safe to send the connection code over WhatsApp?</div>
+      <div class="faq-a">Yes. The code only contains the technical details needed to establish the connection — like your browser's network address. It contains no messages and no encryption keys. Someone who intercepts only the code cannot read your chat.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">What happens if the connection drops mid-chat?</div>
+      <div class="faq-a">The green dot turns red and you'll see a warning. You'll need to repeat the setup — click Host or Join again and exchange new codes. Your previous messages stay visible in your tab until you refresh.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Does this work on mobile?</div>
+      <div class="faq-a">Yes. Velchat works in any modern mobile browser — Chrome, Safari, Firefox. The easiest flow on mobile is: copy the code, switch to WhatsApp or Telegram, paste and send it to the other person, then switch back to Velchat.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Can more than two people join?</div>
+      <div class="faq-a">No. Velchat is a private 1-to-1 channel — one Host, one Peer. Group chat is not supported.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">What happens when I close the tab?</div>
+      <div class="faq-a">The connection ends immediately and all messages are erased from both sides. There's no history, no account, nothing saved. If you want to keep a record, use the Export button before closing.</div>
+    </div>
+
+  </div>
+
+  <div class="warn">
+    <div class="warn-label">⚠️ Before you close</div>
+    If you need to keep a record of the conversation, hit <strong>EXPORT</strong> before closing the tab. Once the tab is closed, the chat is gone forever — by design.
+  </div>
+
+</div>
+
+<div class="footer">
+  <span style="color:var(--neon)">Velchat</span> — Secure P2P Chat
+  <span>Zero servers · Zero logs · End-to-end encrypted</span>
+</div>
+
+<script>
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
+</body>
+</html>
